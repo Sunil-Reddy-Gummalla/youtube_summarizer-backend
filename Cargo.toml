@@ -1,0 +1,14 @@
+[package]
+name = "youtube_summarizer"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+axum = "0.8.7"
+serde = { version = "1.0.228", features = ["derive"] }
+serde_json = "1"
+tokio = { version = "1", features = ["full"] }
+reqwest = { version = "0.12", features = ["json"] }
+dotenvy = "0.15"
+yt-transcript-rs = "0.1.8"
+async-openai = "0.21"
