@@ -1,8 +1,11 @@
 use async_openai::{Client, config::OpenAIConfig, types::CreateCompletionRequestArgs};
+use axum::Json;
 use dotenvy::dotenv;
 use std::env;
+use axum::http::StatusCode;
+use crate::models::summarize_response::SummarizeResponse;
 
-pub async fn summarize_text(text: &str) -> String {
+pub async fn summarize_text(text: &str) -> (StatusCode, Json<SummarizeResponse>) {
     dotenv().ok();
 
     if let Ok(api_key) = env::var("OPENROUTER_API_KEY") {
@@ -16,14 +19,15 @@ pub async fn summarize_text(text: &str) -> String {
             .build()
         {
             if let Ok(response) = client.completions().create(request).await {
-                response.choices[0].text.clone()
+                let summary = response.choices[0].text.clone();
+                return (StatusCode::OK, Json(SummarizeResponse { summary: Some(summary), error: None}));
             } else {
-                return "Error from response of llm".to_string();
+                return (StatusCode::INTERNAL_SERVER_ERROR, Json(SummarizeResponse { summary: None, error: Some("Error from response of llm".to_string())}));
             }
         } else {
-            return "Error creating request".to_string();
+            return (StatusCode::INTERNAL_SERVER_ERROR, Json(SummarizeResponse { summary: None, error: Some("Error creating request".to_string())}));
         }
     } else {
-        return "API Key not found".to_string();
+        return (StatusCode::INTERNAL_SERVER_ERROR, Json(SummarizeResponse { summary: None, error: Some("Error getting api key".to_string())}));
     }
 }
