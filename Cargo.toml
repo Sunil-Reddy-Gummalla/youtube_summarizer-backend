@@ -1,5 +1,5 @@
 [package]
-name = "youtube_summarizer"
+name = "youtube_summarizer_backend"
 version = "0.1.0"
 edition = "2024"
 
