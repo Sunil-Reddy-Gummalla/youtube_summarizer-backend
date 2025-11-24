@@ -7,14 +7,29 @@ RUN cargo chef prepare --recipe-path recipe.json
 
 FROM chef AS builder
 COPY --from=planner /app/recipe.json recipe.json
-# Build dependencies - this is the caching Docker layer!
+
+# Build dependencies
 RUN cargo chef cook --release --recipe-path recipe.json
-# Build application
+
+# Build your app
 COPY . .
 RUN cargo build --release --bin youtube_summarizer_backend
 
-# We do not need the Rust toolchain to run the binary!
+# Runtime image
 FROM debian:bookworm-slim AS runtime
 WORKDIR /app
-COPY --from=builder /app/target/release/youtube_summarizer_backend /usr/local/bin
-ENTRYPOINT ["/usr/local/bin/youtube_summarizer_backend"]
+
+# For HTTPS support — required for calling YouTube/OpenAI APIs
+RUN apt-get update && apt-get install -y ca-certificates && update-ca-certificates
+
+# Copy the binary
+COPY --from=builder /app/target/release/youtube_summarizer_backend /app/app
+
+# Required by Fly.io
+EXPOSE 8080
+
+# Fly.io reads PORT environment variable
+ENV PORT=8080
+
+# Start the binary
+CMD ["/app/app"]

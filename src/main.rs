@@ -17,7 +17,7 @@ use routes::summarize::summarize_routes;
 #[tokio::main]
 async fn main() {
     dotenv().ok();
-    let port = env::var("PORT").unwrap_or_else(|_| String::from("3000"));
+    let port = env::var("PORT").unwrap_or_else(|_| String::from("8080"));
 
     let app = Router::new().merge(summarize_routes()).route("/", get(|| async { "Hello, World!" }));
 
