@@ -12,3 +12,4 @@ reqwest = { version = "0.12", features = ["json"] }
 dotenvy = "0.15"
 yt-transcript-rs = "0.1.8"
 async-openai = "0.21"
+tower-http = { version = "0.6.7", features = ["cors"] }
