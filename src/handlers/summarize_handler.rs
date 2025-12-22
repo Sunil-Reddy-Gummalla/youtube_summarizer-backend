@@ -17,16 +17,16 @@ pub async fn summarize(Json(req): Json<SummarizeRequest>) -> (StatusCode, Json<S
                 let text = transcript_result.text();
                 return summarize_text(&text).await;
             } else {
-                return (
+                (
                     StatusCode::BAD_REQUEST,
                     Json(SummarizeResponse { summary: None, error: Some("Failed to fetch transcript".to_string())}),
-                );
+                )
             }
         } else {
-            return (
+            (
                 StatusCode::INTERNAL_SERVER_ERROR,
                 Json(SummarizeResponse { summary: None, error: Some("Failed to init the Transcripter".to_string()) }),
-            );
+            )
         }
     } else {
         (

@@ -14,20 +14,24 @@ pub async fn summarize_text(text: &str) -> (StatusCode, Json<SummarizeResponse>)
             .with_api_key(api_key);
         let client = Client::with_config(config);
         if let Ok(request) = CreateCompletionRequestArgs::default()
-            .model("x-ai/grok-4.1-fast:free")
-            .prompt(format!("Summerize this Youtube Transcript: /n {text}"))
+            .model("nex-agi/deepseek-v3.1-nex-n1:free")
+            .prompt(format!("Summerize this Youtube Transcript in english: /n {text}"))
             .build()
         {
-            if let Ok(response) = client.completions().create(request).await {
-                let summary = response.choices[0].text.clone();
-                return (StatusCode::OK, Json(SummarizeResponse { summary: Some(summary), error: None}));
-            } else {
-                return (StatusCode::INTERNAL_SERVER_ERROR, Json(SummarizeResponse { summary: None, error: Some("Error from response of llm".to_string())}));
+            match client.completions().create(request).await {
+                Ok(response) => {
+                    let summary = response.choices[0].text.clone();
+                    (StatusCode::OK, Json(SummarizeResponse { summary: Some(summary), error: None}))
+                },
+                Err(e) => {
+                    eprintln!("Error from LLM API: {:?}", e);
+                    (StatusCode::INTERNAL_SERVER_ERROR, Json(SummarizeResponse { summary: None, error: Some("Error from response of llm".to_string())}))
+                }
             }
         } else {
-            return (StatusCode::INTERNAL_SERVER_ERROR, Json(SummarizeResponse { summary: None, error: Some("Error creating request".to_string())}));
+            (StatusCode::INTERNAL_SERVER_ERROR, Json(SummarizeResponse { summary: None, error: Some("Error creating request".to_string())}))
         }
     } else {
-        return (StatusCode::INTERNAL_SERVER_ERROR, Json(SummarizeResponse { summary: None, error: Some("Error getting api key".to_string())}));
+        (StatusCode::INTERNAL_SERVER_ERROR, Json(SummarizeResponse { summary: None, error: Some("Error getting api key".to_string())}))
     }
 }
