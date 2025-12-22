@@ -19,19 +19,28 @@ pub async fn summarize(Json(req): Json<SummarizeRequest>) -> (StatusCode, Json<S
             } else {
                 (
                     StatusCode::BAD_REQUEST,
-                    Json(SummarizeResponse { summary: None, error: Some("Failed to fetch transcript".to_string())}),
+                    Json(SummarizeResponse {
+                        summary: None,
+                        error: Some("Failed to fetch transcript".to_string()),
+                    }),
                 )
             }
         } else {
             (
                 StatusCode::INTERNAL_SERVER_ERROR,
-                Json(SummarizeResponse { summary: None, error: Some("Failed to init the Transcripter".to_string()) }),
+                Json(SummarizeResponse {
+                    summary: None,
+                    error: Some("Failed to init the Transcripter".to_string()),
+                }),
             )
         }
     } else {
         (
             StatusCode::BAD_REQUEST,
-            Json(SummarizeResponse { summary: None, error: Some("Invalid URL".to_string()) }),
+            Json(SummarizeResponse {
+                summary: None,
+                error: Some("Invalid URL".to_string()),
+            }),
         )
     }
 }
